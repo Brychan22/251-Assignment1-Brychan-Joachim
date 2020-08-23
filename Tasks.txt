@@ -1,0 +1,25 @@
+UTF-8 compliant text editor
+    - Open a new editor window
+    - Open text files
+    - Save text files
+    - Search for text in the current document (Ctrl + F)
+    - Exit the program
+    - Select, Cut, Copy, Paste
+    - 'About' with version number, team members etc.
+    - Print, using standard system dialogue
+    - PDF export
+    Extras
+    - Byte Order Mark (BOM) [0xEF, 0xBB, 0xBF]
+    - Source code reading, with appropriate syntax highlighting
+    - Additional save formats
+    - Unit testing
+
+Metrics Data
+    - Saved to $project$/reports/metrics
+PMD
+    - Saved to $project$/reports/PMD
+    Include:
+    - Code Size per class (LOC, Number of Methods)
+    - Code Complexity (Cyclomatic, code coupling)
+    - Code Quality Report from PMD
+        - Naming conventions and related basic 
