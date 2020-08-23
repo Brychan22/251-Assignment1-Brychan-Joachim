@@ -31,38 +31,10 @@ public final class App {
 
     // Log all open windows so that thread-destruction doesn't kill the app. Works
     // in a (superficially) similar way to multiple browser windows/tabs (i.e. Chromium-like browsers)
-    static Map<String, EditorWindow> editorWindows;
+    static Map<Integer, EditorWindow> editorWindows;
 
     static Random PRNG;
     static int appWindowCount = 0;
-
-    // Callback function that takes a string 'x' and removes it from the Map (i.e. provides a callback method for a closing window)
-    static Function<String,Void> closeCallback = (x) -> {
-        if(editorWindows.containsKey(x)){
-            editorWindows.remove(x);
-        }
-        if(editorWindows.isEmpty()){
-            // If that was our last window, close the application
-            System.exit(0);
-        }
-        return null;
-    };
-    // Callback function that provides a way to call the creation of a new window from the App 
-    static Function<File, Void> newWindow = (x) -> {
-        createNewWindow(x);
-        return null;
-    };
-
-    // Callback function that provides a way to call the creation of a new window from the App 
-    static Function<File, String> loadFileContent = (x) -> {
-        try{
-            return loadFile(x);
-        }
-        catch (IOException e){
-            return null;
-        }
-        
-    };
 
     /**
      * Application entry-point
@@ -72,29 +44,25 @@ public final class App {
     public static void main(String[] args) {
         PRNG = new Random();
         // Initialise the empty list of editor windows
-        editorWindows = new HashMap<String, EditorWindow>();
+        editorWindows = new HashMap<Integer, EditorWindow>();
         // initialise the first window
-        newWindow.apply(null);
+        createNewWindow(null);
     }
 
     static void createNewWindow(File sourceFile){
         String fileContent = null;
         if (sourceFile != null){
-            try{
-                loadFile(sourceFile);
-            }
-            catch (IOException e){
-                sourceFile = null;
-            }
+            loadFile(sourceFile);
         }
-        String newID = Integer.toString(appWindowCount++);
-        EditorWindow newEditorWindow = new EditorWindow(closeCallback, newWindow, loadFileContent, newID, sourceFile, fileContent);
+        int newID = appWindowCount++;
+        EditorWindow newEditorWindow = new EditorWindow(newID, sourceFile, fileContent);
         editorWindows.put(newID, newEditorWindow);
         newEditorWindow.init();
     }
 
-    static String loadFile(File sourceFile) throws IOException{
-        StringBuilder resultStringBuilder = new StringBuilder();
+    static String loadFile(File sourceFile){
+        try {
+            StringBuilder resultStringBuilder = new StringBuilder();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile)))) {
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -102,6 +70,21 @@ public final class App {
                     }
             }
             return resultStringBuilder.toString();
+        }
+        catch (IOException e){
+            return null;
+        }
+        
+    }
+
+    static void windowClosed(int id){
+        if(editorWindows.containsKey(id)){
+            editorWindows.remove(id);
+        }
+        if(editorWindows.isEmpty()){
+            // If that was our last window, close the application
+            System.exit(0);
+        }
     }
 
 }

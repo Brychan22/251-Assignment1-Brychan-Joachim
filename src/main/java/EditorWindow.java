@@ -14,21 +14,14 @@ import java.awt.event.*;
  */
 public class EditorWindow {
     private String textContent;
-    private String id; // Used to maintain a temporary file in case it is needed (Document recovery etc)
+    private int id; // Used to maintain a temporary file in case it is needed (Document recovery etc)
     private File sourceFile;
-
-    private Function<String, Void> onClose;
-    private Function<File, Void> newWindow;
-    private Function<File, String> loadFileContent;
     private JTextPane textArea;
     private JFrame thisWindow;
     Random PRNG;
     PrinterJob printerJob = PrinterJob.getPrinterJob();
     
-    EditorWindow(Function<String, Void> closeCallback, Function<File, Void> newWindow, Function<File, String> loadFileContent, String id, File sourceFile, String content){
-        this.onClose = closeCallback;
-        this.newWindow = newWindow;
-        this.loadFileContent = loadFileContent;
+    EditorWindow(int id, File sourceFile, String content){
         this.id = id;
         this.sourceFile = sourceFile;
         if(content != null){
@@ -36,6 +29,9 @@ public class EditorWindow {
         }
     }
 
+    /**
+     * Initialise a new context of Editor Window
+     */
     public void init(){
         PRNG = new Random();
         // Create the frame somewhere inwards from the top-right.
@@ -48,7 +44,6 @@ public class EditorWindow {
         if(textContent != null){
             textArea.setText(textContent);
         }
-
         thisWindow.setVisible(true);
     }
 
@@ -65,7 +60,7 @@ public class EditorWindow {
         JMenuItem newMenuItem = new JMenuItem("New");
         JMenuItem newWindowMenuItem = new JMenuItem("New Window");
         newWindowMenuItem.addActionListener((x) -> {
-            newWindow.apply(null);
+            App.createNewWindow(null);
         });
         JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.addActionListener((x) -> {
@@ -76,14 +71,14 @@ public class EditorWindow {
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
                 if (textContent == null || textArea.getText().equals(textContent)){
-                        String t_result = loadFileContent.apply(fileChooser.getSelectedFile());
+                        String t_result = App.loadFile(fileChooser.getSelectedFile());
                         if (t_result != null){
                             textArea.setText(t_result);
                             textContent = t_result;
                         }
                     }
                 else{
-                    newWindow.apply(fileChooser.getSelectedFile());
+                    App.createNewWindow(fileChooser.getSelectedFile());
                 }
             }
         });
@@ -104,7 +99,7 @@ public class EditorWindow {
         });
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener((x) -> {
-            onClose.apply(id);
+            App.windowClosed(id);
             thisWindow.dispatchEvent(new WindowEvent(thisWindow, WindowEvent.WINDOW_CLOSING));
         });
         fileMenu.add(newMenuItem);
@@ -160,7 +155,7 @@ public class EditorWindow {
         about_contributor = new JLabel("Contributors:");
         about_contributor.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
         // TODO add contributor names properly
-        about_contributor_names = new JLabel("<html>Brychan Dempsey<br>Lachlan</html>"); 
+        about_contributor_names = new JLabel("<html>Brychan Dempsey<br></html>"); 
         // TODO add licence details
         about_licence = new JLabel("<HTML><U>add licence name here</U></HTML>");
         about_licence.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
