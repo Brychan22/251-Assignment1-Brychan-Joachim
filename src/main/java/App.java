@@ -1,30 +1,14 @@
 
 import java.util.Map;
-import java.util.Random;
-import java.util.function.Function;
-
-import javax.management.openmbean.TabularType;
-import javax.swing.*;
-import javax.swing.event.MouseInputListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.AttributeSet.FontAttribute;
-
-import java.awt.*;
-import java.awt.print.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 
-/**
- * Hello world!
- */
+
 public final class App {
     private App() {
     }
@@ -32,23 +16,25 @@ public final class App {
     // Log all open windows so that thread-destruction doesn't kill the app. Works
     // in a (superficially) similar way to multiple browser windows/tabs (i.e. Chromium-like browsers)
     static Map<Integer, EditorWindow> editorWindows;
-
-    static Random PRNG;
     static int appWindowCount = 0;
+
+    static FileNameExtensionFilter supportedFileTypesFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
 
     /**
      * Application entry-point
-     * 
      * @param args
      */
     public static void main(String[] args) {
-        PRNG = new Random();
         // Initialise the empty list of editor windows
         editorWindows = new HashMap<Integer, EditorWindow>();
         // initialise the first window
         createNewWindow(null);
     }
 
+    /**
+     * Creates a new application window
+     * @param sourceFile <i>(Nullable)</i> the file to load when creating the window
+     */
     static void createNewWindow(File sourceFile){
         String fileContent = null;
         if (sourceFile != null){
@@ -60,6 +46,11 @@ public final class App {
         newEditorWindow.init();
     }
 
+    /**
+     * Performs loading the file
+     * @param sourceFile the file to load
+     * @return null if loading failed, else a String of the contents of the file
+     */
     static String loadFile(File sourceFile){
         try {
             StringBuilder resultStringBuilder = new StringBuilder();
@@ -77,6 +68,11 @@ public final class App {
         
     }
 
+    /**
+     * Removes the window of the specified ID from the Map of current windows.
+     * Exits the application if the last window was closed
+     * @param id the window id to remove
+     */
     static void windowClosed(int id){
         if(editorWindows.containsKey(id)){
             editorWindows.remove(id);

@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.print.*;
 import java.io.File;
 import java.util.Random;
-import java.util.function.Function;
 import java.awt.event.*;
 
 /**
@@ -44,15 +43,18 @@ public class EditorWindow {
         if(textContent != null){
             textArea.setText(textContent);
         }
+        if (sourceFile != null){
+            thisWindow.setTitle(sourceFile.getName() + " - Notepad");
+        }
         thisWindow.setVisible(true);
     }
 
     /**
-     * Creates a 'main' window frame
+     * Creates a 'main' window frame.
      * @return a frame representing the main content of the app
      */
     JFrame prepMainFrame(){
-        JFrame mainFrame = new JFrame("Notepad");
+        JFrame mainFrame = new JFrame("New Document - Notepad");
         JMenuBar menuBar = new JMenuBar();
         /* ---- Menus ---- */
         //#region File Menu
@@ -65,8 +67,7 @@ public class EditorWindow {
         JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.addActionListener((x) -> {
             JFileChooser fileChooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
-            fileChooser.setFileFilter(filter);
+            fileChooser.setFileFilter(App.supportedFileTypesFilter);
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
@@ -83,7 +84,17 @@ public class EditorWindow {
             }
         });
         JMenuItem saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.addActionListener((x) -> {
+            if(sourceFile == null){
+                sourceFile = showSaveDialog();
+            }
+            saveFile();
+        });
         JMenuItem saveAsMenuItem = new JMenuItem("Save As");
+        saveAsMenuItem.addActionListener((x) -> {
+            sourceFile = showSaveDialog();
+            saveFile();
+        });
         JMenuItem printMenuItem = new JMenuItem("Print");
         printMenuItem.addActionListener((x) -> {
             if (printerJob.printDialog()) {
@@ -146,16 +157,24 @@ public class EditorWindow {
         mainFrame.add(textArea);
         return mainFrame;
     }
-
+    
+    /**
+     * Creates the 'about' window frame
+     * @return a frame representing the about content
+     */
     JFrame aboutWindow(){
         JFrame aboutFrame = new JFrame("About");
         JLabel about_title, about_contributor, about_licence, about_contributor_names;
+
         about_title = new JLabel("Text Editor");
         about_title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+
         about_contributor = new JLabel("Contributors:");
         about_contributor.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+
         // TODO add contributor names properly
         about_contributor_names = new JLabel("<html>Brychan Dempsey<br></html>"); 
+
         // TODO add licence details
         about_licence = new JLabel("<HTML><U>add licence name here</U></HTML>");
         about_licence.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -172,8 +191,36 @@ public class EditorWindow {
         aboutFrame.setLayout(new BoxLayout(aboutFrame.getContentPane(), BoxLayout.PAGE_AXIS));
         return aboutFrame;
     }
+
+    /**
+     * Shows the file save dialogue box
+     * @return the selected save file
+     */
+    File showSaveDialog(){
+        File targetFile = null;
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select a file to save");
+        fileChooser.setFileFilter(App.supportedFileTypesFilter);
+        int userSelection = fileChooser.showSaveDialog(thisWindow);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            targetFile = fileChooser.getSelectedFile();
+            System.out.println("Save as file: " + targetFile.getAbsolutePath());
+        }
+        return targetFile;
+    }
+
+    /**
+     * TODO: Performs the actual saving of the file
+     */
+    void saveFile(){
+        // TODO
+    }
 }
 
+/**
+ * Litener that will only respond to a mouseClicked event.
+ * Used to allow a JLabel to be clickable
+ */
 class ClickOnlyListener implements MouseListener{
 
     @Override
