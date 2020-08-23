@@ -2,30 +2,35 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.awt.*;
 import java.awt.print.*;
+import java.io.File;
 import java.util.Random;
 import java.util.function.Function;
 import java.awt.event.*;
 
 /**
- * Parent class
+ * Actual editor window class
+ * Provides a unified way to create editor windows. Ties in with App to create editor windows in a single environment.
+ * The app will not exit until all windows are closed
  */
-public class EditorWindow implements ActionListener {
+public class EditorWindow {
     private String textContent;
     private String id; // Used to maintain a temporary file in case it is needed (Document recovery etc)
-    private String filePath;
+    private File sourceFile;
 
     private Function<String, Void> onClose;
-    private Function<String, Void> newWindow;
-
+    private Function<File, Void> newWindow;
+    private Function<File, String> loadFileContent;
+    private JTextPane textArea;
     private JFrame thisWindow;
     Random PRNG;
     PrinterJob printerJob = PrinterJob.getPrinterJob();
     
-    EditorWindow(Function<String, Void> closeCallback, Function<String, Void> newWindow, String id, String filePath, String content){
+    EditorWindow(Function<String, Void> closeCallback, Function<File, Void> newWindow, Function<File, String> loadFileContent, String id, File sourceFile, String content){
         this.onClose = closeCallback;
         this.newWindow = newWindow;
+        this.loadFileContent = loadFileContent;
         this.id = id;
-        this.filePath = filePath;
+        this.sourceFile = sourceFile;
         if(content != null){
             textContent = content;
         }
@@ -40,6 +45,10 @@ public class EditorWindow implements ActionListener {
         // be on-screen with a limit of 500 px
         thisWindow = prepMainFrame();
         thisWindow.setBounds(PRNG.nextInt(500), PRNG.nextInt(500), 600, 600);
+        if(textContent != null){
+            textArea.setText(textContent);
+        }
+
         thisWindow.setVisible(true);
     }
 
@@ -66,7 +75,16 @@ public class EditorWindow implements ActionListener {
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
-                /* Do file load in here */
+                if (textContent == null || textArea.getText().equals(textContent)){
+                        String t_result = loadFileContent.apply(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            textArea.setText(t_result);
+                            textContent = t_result;
+                        }
+                    }
+                else{
+                    newWindow.apply(fileChooser.getSelectedFile());
+                }
             }
         });
         JMenuItem saveMenuItem = new JMenuItem("Save");
@@ -125,6 +143,12 @@ public class EditorWindow implements ActionListener {
         menuBar.add(editMenu);
         menuBar.add(helpMenu);
         mainFrame.setJMenuBar(menuBar);
+        /* End of Menus */
+
+        /* Text Area */
+        textArea = new JTextPane();
+
+        mainFrame.add(textArea);
         return mainFrame;
     }
 
@@ -153,12 +177,6 @@ public class EditorWindow implements ActionListener {
         aboutFrame.setLayout(new BoxLayout(aboutFrame.getContentPane(), BoxLayout.PAGE_AXIS));
         return aboutFrame;
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-
-    }
 }
 
 class ClickOnlyListener implements MouseListener{
@@ -168,7 +186,8 @@ class ClickOnlyListener implements MouseListener{
         JFrame licence = new JFrame("Licence Details");
         licence.setSize(300, 300);
         licence.setVisible(true);
-        // TODO add licence details
+        //File licenceFile = new File("LICENCE");
+        // TODO Load licence here
     }
 
     @Override
