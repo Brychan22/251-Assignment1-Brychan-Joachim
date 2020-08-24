@@ -4,8 +4,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 
@@ -19,6 +22,7 @@ public final class App {
     static int appWindowCount = 0;
 
     static FileNameExtensionFilter supportedFileTypesFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
+    
     // UTF-8 has a typical byte-order mark
     static final byte[] Utf8_BOM = new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF}; 
 
@@ -68,6 +72,51 @@ public final class App {
             return null;
         }
         
+    }
+
+        /**
+     * Saves the specified byte data to the file, showing an error window if an issue occured
+     * @param file the File to save to
+     * @param saveData the array of byte data to save
+     */
+    static boolean saveFile(File file, byte[] saveData) throws SecurityException, FileNotFoundException, IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+        if (!file.exists()){
+            file.createNewFile();
+        }
+        fos.write(saveData);
+        fos.close();
+        return true;     
+    }
+
+    /**
+     * Saves the specified text in the specified format to a file, showing an error message if an issue occurred.
+     * @param file the File to save to
+     * @param saveText the text to save
+     * @param format the <b>java.nio.charset.Charset</b> format to save to
+     */
+    static boolean saveFile(File file, String saveText, String format) throws SecurityException, FileNotFoundException, IOException {
+        byte[] textBytes = saveText.getBytes(Charset.availableCharsets().get(format));
+        if (format == "UTF-8"){
+            byte[] t_textBytes = new byte[textBytes.length + 3];
+            for(int i = 0; i < App.Utf8_BOM.length; i++){
+				t_textBytes[i] = App.Utf8_BOM[i];
+            }
+            for(int i = 0; i < textBytes.length; i++){
+				t_textBytes[i+3] = textBytes[i];
+            }
+            textBytes = t_textBytes;
+        }
+        return saveFile(file, textBytes);
+    }
+
+    /**
+     * Saves the specified text in UTF-8 format to a file, showing an error message if an issue occurred.
+     * @param file the File to save to
+     * @param saveText the text to save
+     */
+    static boolean saveFile(File file, String saveText) throws SecurityException, FileNotFoundException, IOException {
+        return saveFile(file, saveText, "UTF-8");
     }
 
     /**

@@ -93,12 +93,12 @@ public class EditorWindow {
             if(sourceFile == null){
                 sourceFile = showSaveDialog();
             }
-            saveFile(sourceFile, textArea.getText());
+            doSave();
         });
         JMenuItem saveAsMenuItem = new JMenuItem("Save As");
         saveAsMenuItem.addActionListener((x) -> {
             sourceFile = showSaveDialog();
-            saveFile(sourceFile, textArea.getText());
+            doSave();
         });
         JMenuItem printMenuItem = new JMenuItem("Print");
         printMenuItem.addActionListener((x) -> {
@@ -205,70 +205,58 @@ public class EditorWindow {
         File targetFile = null;
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select a file to save");
-        fileChooser.setFileFilter(App.supportedFileTypesFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false); 
+        fileChooser.addChoosableFileFilter(App.supportedFileTypesFilter);
+        
+        
         int userSelection = fileChooser.showSaveDialog(thisWindow);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            targetFile = fileChooser.getSelectedFile();
+            boolean validExt = false;
+            for (String extension : ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()) {
+                if(fileChooser.getSelectedFile().getName().toLowerCase().endsWith(extension.toLowerCase())){
+                    validExt = true;
+                    break;
+                }
+            }
+            if(validExt){
+                targetFile = fileChooser.getSelectedFile();
+            }
+            else{
+                targetFile = new File(fileChooser.getSelectedFile().getName() + "." + ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()[0]);
+            }
+            
             System.out.println("Save as file: " + targetFile.getAbsolutePath());
         }
         return targetFile;
     }
 
-    /**
-     * Saves the specified byte data to the file, showing an error window if an issue occured
-     * @param file the File to save to
-     * @param saveData the array of byte data to save
-     */
-    void saveFile(File file, byte[] saveData) {
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            if (!file.exists()){
-                file.createNewFile();
+    void doSave(){
+        try{
+            if(App.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
+                thisWindow.setTitle(sourceFile.getName() + " - Document");
             }
-            fos.write(saveData);
         }
         catch (SecurityException e){
-            drawPopupAlert("Error", "Access to the file was denied:\n\n" + e.getStackTrace());
+            drawPopupAlert("Error", "Access to the file was denied:\n\n" + e.getLocalizedMessage());
         }
         catch (FileNotFoundException e){
-            drawPopupAlert("Error", "Failed to write to the file as it could not be opened:\n\n" + e.getStackTrace());
+            drawPopupAlert("Error", "Failed to write to the file as it could not be opened:\n\n" + e.getLocalizedMessage());
         }
         catch (IOException e){
-            drawPopupAlert("Error", "An IO Error occurred:\n\n" + e.getStackTrace());
-        }       
-    }
-
-    /**
-     * Saves the specified text in the specified format to a file, showing an error message if an issue occurred.
-     * @param file the File to save to
-     * @param saveText the text to save
-     * @param format the <b>java.nio.charset.Charset</b> format to save to
-     */
-    void saveFile(File file, String saveText, String format){
-        byte[] textBytes = saveText.getBytes(Charset.availableCharsets().get(format));
-        if (format == "UTF-8"){
-            byte[] t_textBytes = new byte[textBytes.length + 3];
-            for(int i = 0; i < App.Utf8_BOM.length; i++){
-				t_textBytes[i] = App.Utf8_BOM[i];
-            }
-            for(int i = 0; i < textBytes.length; i++){
-				t_textBytes[i+3] = textBytes[i];
-            }
-            textBytes = t_textBytes;
-        }
-        saveFile(file, textBytes);
-    }
-
-    /**
-     * Saves the specified text in UTF-8 format to a file, showing an error message if an issue occurred.
-     * @param file the File to save to
-     * @param saveText the text to save
-     */
-    void saveFile(File file, String saveText){
-        saveFile(file, saveText, "UTF-8");
+            drawPopupAlert("Error", "An IO Error occurred:\n\n" + e.getLocalizedMessage());
+        }  
     }
 
     void drawPopupAlert(String title, String message){
-
+        JFrame alertFrame = new JFrame(title);
+        int size = 300;
+        alertFrame.setBounds(thisWindow.getX() + thisWindow.getWidth() / 2 - size/2, thisWindow.getY() + thisWindow.getHeight() / 2-size/2, size, size);
+        // Replace newlines with html breaks
+        message = message.replace("\r\n", "\n");
+        message = message.replace("\n", "<br>");
+        JLabel alertText = new JLabel("<html>" + message + "</html>");
+        alertFrame.add(alertText);
+        alertFrame.setVisible(true);
     }
 }
 
