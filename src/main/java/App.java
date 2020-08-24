@@ -18,7 +18,7 @@ public final class App {
 
     // Log all open windows so that thread-destruction doesn't kill the app. Works
     // in a (superficially) similar way to multiple browser windows/tabs (i.e. Chromium-like browsers)
-    static Map<Integer, EditorWindow> editorWindows;
+    static Map<Integer, EditorWindow> editorWindows = new HashMap<Integer, EditorWindow>();
     static int appWindowCount = 0;
 
     static FileNameExtensionFilter supportedFileTypesFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
@@ -31,8 +31,6 @@ public final class App {
      * @param args
      */
     public static void main(String[] args) {
-        // Initialise the empty list of editor windows
-        editorWindows = new HashMap<Integer, EditorWindow>();
         // initialise the first window
         createNewWindow(null);
     }
@@ -42,11 +40,13 @@ public final class App {
      * @param sourceFile <i>(Nullable)</i> the file to load when creating the window
      */
     static void createNewWindow(File sourceFile){
+        System.err.println("test");
         String fileContent = null;
         if (sourceFile != null){
             loadFile(sourceFile);
         }
         int newID = appWindowCount++;
+        
         EditorWindow newEditorWindow = new EditorWindow(newID, sourceFile, fileContent);
         editorWindows.put(newID, newEditorWindow);
         newEditorWindow.init();
