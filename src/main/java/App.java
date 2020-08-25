@@ -8,7 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -40,10 +42,15 @@ public final class App {
      * @param sourceFile <i>(Nullable)</i> the file to load when creating the window
      */
     static void createNewWindow(File sourceFile){
-        System.err.println("test");
         String fileContent = null;
-        if (sourceFile != null){
-            loadFile(sourceFile);
+        if (sourceFile != null) {
+            try{
+                loadFileString(sourceFile);
+            }
+            catch (Exception e){
+
+            }
+            
         }
         int newID = appWindowCount++;
         
@@ -51,11 +58,64 @@ public final class App {
         editorWindows.put(newID, newEditorWindow);
     }
 
+
+    static byte[] loadFileBytes(File sourceFile) throws IOException {
+        // initialise the buffer with a default 32k
+        byte[] readBytes = new byte[32768];
+        int length = 0;
+        try (FileInputStream fs = new FileInputStream(sourceFile)){
+            byte[] bufferBytes = new byte[16384];
+            while (fs.available() > 0){
+                int bufferSize = fs.read(bufferBytes);
+                // Resize the buffer if the data won't fit
+                if (readBytes.length - length <= bufferSize){
+                    byte[] newReadBytes = new byte[readBytes.length*2]; // Similar implementation to a list
+                    for (int i = 0; i<length; i++){
+                        newReadBytes[i] = readBytes[i];
+                    }
+                    readBytes = newReadBytes;
+                }
+                // Add the buffered bytes
+                for (int i = length; i < length + bufferSize; i++){
+                    readBytes[i] = bufferBytes[i-length];
+                }
+                length += bufferSize;
+            }
+        }
+        byte[] finalBytes = new byte[length];
+        for(int i=0; i < length; i++){
+            finalBytes[i] = readBytes[i];
+        }
+        return finalBytes;
+    }
+
+    static String loadFileString(File sourceFile, String charset, byte[] filterBOM) throws IOException, UnsupportedEncodingException {
+        byte[] readBytes = loadFileBytes(sourceFile);
+        boolean BomPresent = true;
+        for (int i=0; i<filterBOM.length; i++) {
+            if (readBytes[i] != filterBOM[i]){
+                BomPresent = false;
+                break;
+            }
+        }
+        // Consume the BOM
+        if(BomPresent){
+            return new String(readBytes, filterBOM.length, readBytes.length - filterBOM.length, charset);
+        }
+        else{
+            return new String(readBytes, charset);
+        }
+    }
+
+    static String loadFileString(File sourceFile) throws IOException, UnsupportedEncodingException {
+        return loadFileString(sourceFile, "UTF-8", Utf8_BOM);
+    }
     /**
      * Performs loading the file
      * @param sourceFile the file to load
      * @return null if loading failed, else a String of the contents of the file
      */
+    @Deprecated
     static String loadFile(File sourceFile){
         try {
             StringBuilder resultStringBuilder = new StringBuilder();
@@ -70,7 +130,6 @@ public final class App {
         catch (IOException e){
             return null;
         }
-        
     }
 
         /**

@@ -34,7 +34,7 @@ class AppTest {
     @Test
     void testTextSaveLoad() {
         assertDoesNotThrow(() -> {
-            assertEquals(expected, App.loadFile(testFile));
+            assertEquals(expected, App.loadFileString(testFile));
         }, "Failed loading the test file");
     }
 }

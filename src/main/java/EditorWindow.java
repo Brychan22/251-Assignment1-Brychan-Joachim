@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Random;
@@ -71,12 +72,17 @@ public class EditorWindow {
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
                 if (textContent == null || textArea.getText().equals(textContent)){
-                        String t_result = App.loadFile(fileChooser.getSelectedFile());
+                    try{
+                        String t_result = App.loadFileString(fileChooser.getSelectedFile());
                         if (t_result != null){
                             textArea.setText(t_result);
                             textContent = t_result;
                         }
                     }
+                    catch (IOException e) { 
+                        drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
+                    } 
+                }
                 else{
                     App.createNewWindow(fileChooser.getSelectedFile());
                 }
