@@ -31,12 +31,6 @@ public class EditorWindow {
         if(content != null){
             textContent = content;
         }
-    }
-
-    /**
-     * Initialise a new context of Editor Window
-     */
-    public void init(){
         PRNG = new Random();
         // Create the frame somewhere inwards from the top-right.
         // Would be better to actually detect screen size though that requires a more 

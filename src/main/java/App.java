@@ -49,7 +49,6 @@ public final class App {
         
         EditorWindow newEditorWindow = new EditorWindow(newID, sourceFile, fileContent);
         editorWindows.put(newID, newEditorWindow);
-        newEditorWindow.init();
     }
 
     /**
