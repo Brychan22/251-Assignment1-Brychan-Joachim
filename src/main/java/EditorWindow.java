@@ -7,6 +7,7 @@ import javax.swing.text.StyledDocument;
 import org.apache.tika.exception.TikaException;
 
 import NotepadIO.NotepadIO;
+import Syntax.JavaHighlighter;
 
 import java.awt.*;
 import java.awt.print.*;
@@ -78,6 +79,7 @@ public class EditorWindow {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(App.textFileFilter);
             fileChooser.addChoosableFileFilter(App.ODFFileFilter);
+            fileChooser.addChoosableFileFilter(App.JavaFileFilter);
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
@@ -90,6 +92,15 @@ public class EditorWindow {
                                 textArea.setContentType("text/html");
                                 textArea.setText(t_result);
                             }
+                        }
+                        else if (fileChooser.getFileFilter() == App.JavaFileFilter){
+                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                            if (t_result != null){
+                                textArea.setText(t_result);
+                            }
+                            StyledDocument doc = textArea.getStyledDocument();
+                            JavaHighlighter jh = new JavaHighlighter(t_result);
+                            jh.highlightSymbols(doc);
                         }
                         else{
                             String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());

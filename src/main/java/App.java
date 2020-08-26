@@ -30,6 +30,7 @@ public final class App {
 
     static FileNameExtensionFilter textFileFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
     static FileNameExtensionFilter ODFFileFilter = new FileNameExtensionFilter("Open-Office Document (*.odt)", "odt");
+    static FileNameExtensionFilter JavaFileFilter = new FileNameExtensionFilter("Java Source File (*.java)", "java");
     
     // UTF-8 has a typical byte-order mark
     static final byte[] Utf8_BOM = new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF}; 
