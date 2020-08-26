@@ -92,7 +92,7 @@ public class EditorWindow {
                             }
                         }
                         else{
-                            String t_result = App.loadFileString(fileChooser.getSelectedFile());
+                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
                             if (t_result != null){
                                 textArea.setText(t_result);
                             }
@@ -251,7 +251,7 @@ public class EditorWindow {
 
     void doSave(){
         try{
-            if(App.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
+            if(NotepadIO.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
                 thisWindow.setTitle(sourceFile.getName() + " - Document");
             }
         }
