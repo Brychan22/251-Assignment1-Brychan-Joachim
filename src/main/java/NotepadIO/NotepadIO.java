@@ -3,6 +3,31 @@ package NotepadIO;
 import java.io.*;
 import java.nio.charset.Charset;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import java.awt.*;
+
+import org.apache.tika.sax.*;
+import org.apache.tika.sax.ToXMLContentHandler;
+import org.apache.tika.parser.*;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 public class NotepadIO {
     // UTF-8 has a typical byte-order mark
     static final byte[] Utf8_BOM = new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF}; 
@@ -69,6 +94,17 @@ public class NotepadIO {
         }
         else{
             return new String(bytes, charset);
+        }
+    }
+
+    public static String loadMiscViaTika(File file) throws IOException, SAXException, TikaException{
+        ContentHandler handler = new ToXMLContentHandler();
+ 
+        AutoDetectParser parser = new AutoDetectParser();
+        Metadata metadata = new Metadata();
+        try (InputStream stream = new FileInputStream(file)) {
+            parser.parse(stream, handler, metadata);
+            return handler.toString();
         }
     }
 

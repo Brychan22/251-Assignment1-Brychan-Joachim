@@ -26,7 +26,8 @@ public final class App {
     static Map<Integer, EditorWindow> editorWindows = new HashMap<Integer, EditorWindow>();
     static int appWindowCount = 0;
 
-    static FileNameExtensionFilter supportedFileTypesFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
+    static FileNameExtensionFilter textFileFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
+    static FileNameExtensionFilter ODFFileFilter = new FileNameExtensionFilter("Open-Office Document (*.odt)", "odt");
     
     // UTF-8 has a typical byte-order mark
     static final byte[] Utf8_BOM = new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF}; 
