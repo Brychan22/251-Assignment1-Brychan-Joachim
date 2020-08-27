@@ -42,7 +42,6 @@ public class EditorWindow {
     private JFrame thisWindow;
     private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     Random PRNG;
-    PrinterJob printerJob = PrinterJob.getPrinterJob();
     
     EditorWindow(int id, File sourceFile, String content){
         this.id = id;
@@ -77,8 +76,7 @@ public class EditorWindow {
         /* ---- Menus ---- */
         //#region File Menu
         JMenu fileMenu = new JMenu("File");
-        JMenuItem newMenuItem = new JMenuItem("New");
-        JMenuItem newWindowMenuItem = new JMenuItem("New Window");
+        JMenuItem newWindowMenuItem = new JMenuItem("New");
         newWindowMenuItem.addActionListener((x) -> {
             App.createNewWindow(null);
         });
@@ -140,30 +138,27 @@ public class EditorWindow {
         });
         JMenuItem printMenuItem = new JMenuItem("Print");
         printMenuItem.addActionListener((x) -> {
-            if (printerJob.printDialog()) {
-                try {printerJob.print();}
+                try {
+            		boolean complete = textArea.print();
+            		if(complete) {
+            			JOptionPane.showMessageDialog(null, "Done Printing!", "Information", JOptionPane.INFORMATION_MESSAGE);
+            		}
+        		}
                 catch (PrinterException exc) {
                     System.out.println(exc);
                  }
-             } 
-        });
-        JMenuItem pageSetupMenuItem = new JMenuItem("Page Setup...");
-        pageSetupMenuItem.addActionListener((x) -> {
-            printerJob.pageDialog(printerJob.defaultPage());
         });
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener((x) -> {
             App.windowClosed(id);
             thisWindow.dispatchEvent(new WindowEvent(thisWindow, WindowEvent.WINDOW_CLOSING));
         });
-        fileMenu.add(newMenuItem);
         fileMenu.add(newWindowMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(saveMenuItem);
         fileMenu.add(saveAsMenuItem);
         fileMenu.addSeparator();
         fileMenu.add(printMenuItem);
-        fileMenu.add(pageSetupMenuItem);
         fileMenu.addSeparator();
         fileMenu.add(exitMenuItem);
         //#endregion
