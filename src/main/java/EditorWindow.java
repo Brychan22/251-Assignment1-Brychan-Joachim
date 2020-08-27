@@ -243,8 +243,14 @@ public class EditorWindow {
 
         /* Text Area */
         textArea = new JTextPane();
-
         mainFrame.add(textArea);
+        
+        /* scrollbar */        
+        JScrollPane scroll = new JScrollPane (textArea,
+     		   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        mainFrame.add(scroll);
+
         return mainFrame;
     }
     
