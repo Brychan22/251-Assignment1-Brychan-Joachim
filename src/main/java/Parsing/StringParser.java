@@ -94,5 +94,26 @@ public class StringParser {
             return false;
         }
     }
+
+    /**
+     * Takes a word and identifies if we're currently inside it
+     * @param s the input word to search
+     * @return true if the word matches
+     */
+    public boolean inWord(String s){
+        char currentChar = current();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == currentChar){
+                int oldPos = position;
+                position -= i;
+                boolean atW = atWord(s);
+                position = oldPos;
+                if (atW){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     
 }

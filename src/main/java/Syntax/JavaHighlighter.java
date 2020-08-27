@@ -11,7 +11,7 @@ import Parsing.StringParser;
 
 import java.awt.Color;
 
-public class JavaHighlighter implements Highlighter{
+public class JavaHighlighter{
     // Keep track of all identified points
     Map<Integer, Integer> keywordPoints = new HashMap<>();
     Map<Integer, Integer> stringPoints = new HashMap<>();
@@ -27,108 +27,125 @@ public class JavaHighlighter implements Highlighter{
         this.source = source;
     }
 
-    static String[] Keywords = new String[]{"public", "private", "protected", "package", "static", "implements", "extends", "true", "false", "import", "final", "class", "if", "else", "return", "switch", "case", "null"};
-    static String[] Classes = new String[]{"String", "File", "int", "Integer", "char", "boolean", "void", "Map", "double", "float", "byte", "Exception", "Map"};
+    //
+    static String[] Keywords = new String[]{"abstract", "assert", "break", "case", "catch", "class", "const", "continue", "do", "else", "enum", "extends", "final", "finally", "for", "goto", "if", "implements", "import", "instanceof", "interface", "native", "new", "package", "private", "protected", "public", "return", "static", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while"};
+    // values that are usually drawn as keywords
+    static String[] keywordData = new String[]{"true", "false", "null"};
+    // base class types
+    static String[] Classes = new String[]{"String", "int", "Integer", "char", "Character", "boolean", "Boolean", "double", "Double", "float", "Float", "byte", "Byte", "Exception"};
+
+    /**
+     * Matches an expression from the current position if it matches search, through to end, ignoring ignore
+     * @param search
+     * @param ignore
+     * @param end
+     * @param target
+     */
+    private void SearchSymbolBounds(String search, String ignore, String end, Map<Integer, Integer> target){
+        if(parser.atWord(search)){
+            int startPos = parser.getPostition();
+            int endPos = parser.findNext(end != null ? end : search);
+            parser.move(endPos-startPos);
+            if (ignore != null){
+                while (parser.inWord(ignore)){
+                    parser.move(endPos-startPos);
+                    endPos = parser.findNext(end != null ? end : search);
+                }
+            }
+            target.put(startPos, endPos + (end != null ? end.length() : search.length()));            
+        }
+    }
+
+    private void searchWordBounds(String word, char[] acceptedStarts, char[] acceptedEnds, boolean strict, Map<Integer, Integer> target){
+        if (parser.atWord(word)){
+            int startCharIndex = -1;
+            int endCharIndex = -1;
+            for (int i = 0; i < acceptedStarts.length; i++) {
+                if(acceptedStarts[i] == parser.behind()){
+                    startCharIndex = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < acceptedEnds.length; i++)  {
+                if(acceptedEnds[i] == parser.peek(word.length())){
+                    endCharIndex = i;
+                    break;
+                }
+            }
+            if (strict && (acceptedEnds != acceptedStarts)){
+                return;
+            }
+            else if (startCharIndex >= 0 && endCharIndex >= 0){
+                target.put(parser.getPostition(), parser.getPostition() + word.length());
+                parser.move(word.length());
+            }
+            
+        }
+    }
+
+    private void searchNumber(Map<Integer, Integer> target){
+        if (parser.current() >= '0' && parser.current() <= '9' && (parser.behind() == ' ' || parser.behind() == '(' || parser.behind() == ')' || parser.behind() == '[')){
+            boolean hex = false;
+            if (parser.peek() == 'x' && (parser.peek(2) >= '0'|| parser.peek(2) >= 'A') && (parser.peek(2) <= '9' || parser.peek(2) <= 'F')){
+                hex = true;
+            }
+            // Numbers
+            int startPos = parser.getPostition();
+            while((parser.peek() >= '0' && parser.peek() <= '9' ) || hex && ((parser.peek() >= 'A' && parser.peek() <= 'F') || parser.peek() == 'x')){
+                parser.move();
+            }
+            target.put(startPos, parser.getPostition()+1);
+        }
+    }
+
 
     public void highlightSymbols(StyledDocument doc){
-        int next =0;
-        try{
-            charloop:
-        while(parser.move()){
-            if (parser.current() == '/' && parser.peek() == '/'){
-                // line comment
-                int endpos = parser.findNext("\n");
-                commentPoints.put(parser.getPostition(), endpos);
-                parser.move(endpos-parser.getPostition());
+        while (parser.move()){
+            // Find comments first
+            SearchSymbolBounds("//", null, "\n", commentPoints);
+            SearchSymbolBounds("/*", null, "*/", commentPoints);
+            // Find strings
+            SearchSymbolBounds("\"", "\\\"", "\"", stringPoints);
+            // Find classes
+            for (String string : Classes) {
+                searchWordBounds(string, new char[]{' ', '(', '<', '\n', 0, '['}, new char[]{' ', ')', '>', ',', '.', '}', '[', ']'}, false, classPoints);
             }
-            if (parser.current() == '/' && parser.peek() == '*'){
-                // block comment
-                int endpos = parser.findNext("*/");
-                commentPoints.put(parser.getPostition(), endpos+2);
-                parser.move(endpos-parser.getPostition());
+            // Find keywords
+            for (String string : Keywords){
+                searchWordBounds(string, new char[]{' ', '\n', 0, '{','('}, new char[]{' ', '{', '('}, false, keywordPoints);
             }
-            for (String keyword : Keywords) {
-                if(parser.atWord(keyword)){
-                    if ((parser.behind() == '\n' || parser.behind() == ' ' || parser.behind() == 0) && parser.peek(keyword.length()) == ' ' ){
-                        keywordPoints.put(parser.getPostition(), parser.getPostition() + keyword.length());
-                        parser.move(keyword.length());
-                        //continue charloop; // skip to next character iteration
-                    }
-                }
+            // Find data that are normally highlighted like keywords
+            for (String string : keywordData){
+                searchWordBounds(string, new char[]{' ', '=', '<', '('}, new char[]{' ', ';', ',', '>', ')'}, false, keywordPoints);
             }
-            for (String sClass : Classes) {
-                if(parser.atWord(sClass)){
-                    if (((parser.behind() == '\n' || parser.behind() == ' ' || parser.behind() == 0 || parser.behind() == '<') // Begins with \n, start of file, '<' or ' '
-                    && (parser.peek(sClass.length()) == ' ' || parser.peek(sClass.length()) == '[')) || // Ends with ' ' or [
-                    (parser.behind() == '(' && parser.peek(sClass.length()) == ')')) // Case that we're casting eg. (byte)
-                    {
-                        classPoints.put(parser.getPostition(), parser.getPostition() + sClass.length());
-                        parser.move(sClass.length());
-                        //continue charloop; // skip to next character iteration
-                    }
-                }
-            }
-            if (parser.current() == '\"'){
-                int startPos = parser.getPostition();
-                //int next = parser.findNext("\"");
-                next = parser.findNext("\"");
-                if (next == -1){
-                    int i = 0;
-                }
-                while(!parser.isEnd(0) && source.substring(parser.getPostition(), next).endsWith("\\\"")){ // handle the escaped quotation mark
-                    parser.move(next-parser.getPostition());
-                    next = parser.findNext("\"");
-                    if (next == -1) {
-                        next = parser.getPostition();
-                        //break;
-                    }
-                }
-                stringPoints.put(startPos, next+1);
-                parser.move(next-startPos);
-            }
-
-            if (parser.current() >= '0' && parser.current() <= '9' && (parser.behind() == ' ' || parser.behind() == '(' || parser.behind() == ')' || parser.behind() == '[')){
-                boolean hex = false;
-                if (parser.peek() == 'x' && (parser.peek(2) >= '0'|| parser.peek(2) >= 'A') && (parser.peek(2) <= '9' || parser.peek(2) <= 'F')){
-                    hex = true;
-                }
-                // Numbers
-                int startPos = parser.getPostition();
-                while((parser.peek() >= '0' && parser.peek() <= '9' ) || hex && ((parser.peek() >= 'A' && parser.peek() <= 'F') || parser.peek() == 'x')){
-                    parser.move();
-                }
-                numberPoints.put(startPos, parser.getPostition()+1);
-            }
+            // Search numbers
+            searchNumber(numberPoints);
         }
 
         SimpleAttributeSet keywordsAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(keywordsAttributeSet, Color.BLUE);
+        StyleConstants.setForeground(keywordsAttributeSet, new Color(0x1080FF));
         for (Integer key : keywordPoints.keySet()) {
             doc.setCharacterAttributes(key, keywordPoints.get(key)-key, keywordsAttributeSet, false);  
         }
         SimpleAttributeSet stringAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(stringAttributeSet, Color.ORANGE);
+        StyleConstants.setForeground(stringAttributeSet, new Color(0xA62817));
         for (Integer key : stringPoints.keySet()) {
             doc.setCharacterAttributes(key, stringPoints.get(key)-key, stringAttributeSet, false);  
         }
         SimpleAttributeSet numberAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(numberAttributeSet, Color.GRAY);
+        StyleConstants.setForeground(numberAttributeSet, new Color(0x787813));
         for (Integer key : numberPoints.keySet()) {
             doc.setCharacterAttributes(key, numberPoints.get(key)-key, numberAttributeSet, false);  
         }
         SimpleAttributeSet classAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(classAttributeSet, Color.RED);
+        StyleConstants.setForeground(classAttributeSet, new Color(0x2395C2));
         for (Integer key : classPoints.keySet()) {
             doc.setCharacterAttributes(key, classPoints.get(key)-key, classAttributeSet, false);  
         }
         SimpleAttributeSet commentAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(commentAttributeSet, Color.GREEN);
+        StyleConstants.setForeground(commentAttributeSet, new Color(0x207513));
         for (Integer key : commentPoints.keySet()) {
             doc.setCharacterAttributes(key, commentPoints.get(key)-key, commentAttributeSet, false);  
-        }
-        }
-        catch (IndexOutOfBoundsException e){
-            int i = 0;
         }
         
     }    
