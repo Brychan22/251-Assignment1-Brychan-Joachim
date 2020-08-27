@@ -136,6 +136,11 @@ public class EditorWindow {
             sourceFile = showSaveDialog();
             doSave();
         });
+        JMenuItem exportPdfMenuItem = new JMenuItem("Export As PDF");
+        exportPdfMenuItem.addActionListener((x) -> {
+            sourceFile = showSaveDialog();
+            savePdf();
+        });
         JMenuItem printMenuItem = new JMenuItem("Print");
         printMenuItem.addActionListener((x) -> {
                 try {
@@ -158,6 +163,7 @@ public class EditorWindow {
         fileMenu.add(saveMenuItem);
         fileMenu.add(saveAsMenuItem);
         fileMenu.addSeparator();
+        fileMenu.add(exportPdfMenuItem);
         fileMenu.add(printMenuItem);
         fileMenu.addSeparator();
         fileMenu.add(exitMenuItem);
@@ -313,6 +319,7 @@ public class EditorWindow {
         fileChooser.setDialogTitle("Select a file to save");
         fileChooser.setAcceptAllFileFilterUsed(false); 
         fileChooser.addChoosableFileFilter(App.textFileFilter);
+        fileChooser.addChoosableFileFilter(App.pdfFileFilter);
         
         
         int userSelection = fileChooser.showSaveDialog(thisWindow);
@@ -335,9 +342,9 @@ public class EditorWindow {
         }
         return targetFile;
     }
-
-    void doSave(){
-        try{
+    
+    void doSave() {
+    	try{
             if(NotepadIO.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
                 thisWindow.setTitle(sourceFile.getName() + " - Document");
             }
@@ -350,6 +357,15 @@ public class EditorWindow {
         }
         catch (IOException e){
             drawPopupAlert("Error", "An IO Error occurred:\n\n" + e.getLocalizedMessage());
+        }  
+    }
+    
+    void savePdf(){
+        try{
+            NotepadIO.createPdf(sourceFile, textArea.getText());
+        }
+        catch (SecurityException e){
+            drawPopupAlert("Error", "Access to the file was denied:\n\n" + e.getLocalizedMessage());
         }  
     }
 
