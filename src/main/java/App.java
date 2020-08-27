@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -49,7 +52,8 @@ public final class App {
      * @param sourceFile <i>(Nullable)</i> the file to load when creating the window
      */
     static void createNewWindow(File sourceFile){
-        String fileContent = null;
+    	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
+        String fileContent = date + '\n';
         if (sourceFile != null) {
             try{
                 NotepadIO.loadFileString(sourceFile);

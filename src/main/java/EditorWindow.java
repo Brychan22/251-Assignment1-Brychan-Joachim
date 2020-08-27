@@ -18,6 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Random;
 import java.awt.event.*;
@@ -164,10 +167,20 @@ public class EditorWindow {
         JMenuItem cutMenuItem = new JMenuItem("Cut");
         JMenuItem copyMenuItem = new JMenuItem("Copy");
         JMenuItem pasteMenuItem = new JMenuItem("Paste");
+        JMenuItem dateAndTimeMenuItem = new JMenuItem("Time/Date");
+        dateAndTimeMenuItem.addActionListener((x) -> {
+        	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
+        	try {
+				textArea.getDocument().insertString(textArea.getCaretPosition(), date, null);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+        });
 
         editMenu.add(cutMenuItem);
         editMenu.add(copyMenuItem);
         editMenu.add(pasteMenuItem);
+        editMenu.add(dateAndTimeMenuItem);
         //#endregion
         //#region Help Menu
         JMenu helpMenu = new JMenu("Help");
