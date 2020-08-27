@@ -10,6 +10,10 @@ import NotepadIO.NotepadIO;
 import Syntax.JavaHighlighter;
 
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.print.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +40,7 @@ public class EditorWindow {
     private File sourceFile;
     private JTextPane textArea;
     private JFrame thisWindow;
+    private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     Random PRNG;
     PrinterJob printerJob = PrinterJob.getPrinterJob();
     
@@ -165,8 +170,45 @@ public class EditorWindow {
         //#region Edit Menu
         JMenu editMenu = new JMenu("Edit");
         JMenuItem cutMenuItem = new JMenuItem("Cut");
+        cutMenuItem.addActionListener((x) -> {
+       	 if (textArea.getSelectedText() != null) { // See if they selected something 
+                String string = textArea.getSelectedText();
+                StringSelection selection = new StringSelection(string);
+                clipboard.setContents(selection, selection);
+                textArea.replaceSelection("");
+            } else {
+            	JFrame warningFrame = warningWindow("No string is selected!");
+            	warningFrame.setVisible(true);
+            }
+        });
+        
+        
         JMenuItem copyMenuItem = new JMenuItem("Copy");
+        copyMenuItem.addActionListener((x) -> {
+        	 if (textArea.getSelectedText() != null) { // See if they selected something 
+                 String string = textArea.getSelectedText();
+                 StringSelection selection = new StringSelection(string);
+                 clipboard.setContents(selection, selection);
+             } else {
+            	 JFrame warningFrame = warningWindow("No string is selected!");
+            	 warningFrame.setVisible(true);
+             }
+        });
+        
         JMenuItem pasteMenuItem = new JMenuItem("Paste");
+        pasteMenuItem.addActionListener((x) -> {
+        	Transferable content = clipboard.getContents(this);
+            String clipboardString;
+            try {
+            	clipboardString = (String) content.getTransferData(DataFlavor.stringFlavor);
+              	textArea.getDocument().insertString(textArea.getCaretPosition(), clipboardString, null);
+            } catch (Exception e) {
+            	e.printStackTrace();
+              	JFrame warningFrame = warningWindow("Clipboard does not contain string!");
+     	 		warningFrame.setVisible(true);
+            }
+       });
+       
         JMenuItem dateAndTimeMenuItem = new JMenuItem("Time/Date");
         dateAndTimeMenuItem.addActionListener((x) -> {
         	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
@@ -240,6 +282,26 @@ public class EditorWindow {
         return aboutFrame;
     }
 
+    /**
+     * Creates a popup window if copy is pressed but nothing is selected
+     */
+    JFrame warningWindow(String warningMessage){
+        JFrame noSelectionFrame = new JFrame(warningMessage);
+        JLabel warning;
+
+        warning = new JLabel(warningMessage);
+        warning.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+
+        noSelectionFrame.setTitle(warningMessage);
+        noSelectionFrame.add(warning);
+        
+        noSelectionFrame.setSize(300, 100);
+        noSelectionFrame.setLayout(new BoxLayout(noSelectionFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+        return noSelectionFrame;
+    }
+
+    
+    
     /**
      * Shows the file save dialogue box
      * @return the selected save file
