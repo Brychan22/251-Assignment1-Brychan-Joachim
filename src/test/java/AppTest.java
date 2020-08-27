@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTimeout;
 
 import java.io.File;
 
+import NotepadIO.NotepadIO;
+
 
 /**
  * Unit test for simple App.
@@ -22,8 +24,8 @@ class AppTest {
     static File testODT = new File("test.odt");
     @BeforeAll
     static void createFiles() {
-        assertDoesNotThrow(() -> App.saveFile(testFile, expected), "Failed to create the test file");
-        assertDoesNotThrow(() -> App.saveFile(testFileBinary, expectedBytes), "Failed to create the test file");
+        assertDoesNotThrow(() -> NotepadIO.saveFile(testFile, expected), "Failed to create the test file");
+        assertDoesNotThrow(() -> NotepadIO.saveFile(testFileBinary, expectedBytes), "Failed to create the test file");
     }
     @AfterAll
     static void removeFiles() {
@@ -42,7 +44,7 @@ class AppTest {
     @Test
     void testTextSaveLoad() {
         assertDoesNotThrow(() -> {
-            assertEquals(expected, App.loadFileString(testFile));
+            assertEquals(expected, NotepadIO.loadFileString(testFile));
         }, "Failed loading the text test file");
     }
 
@@ -50,7 +52,7 @@ class AppTest {
     void testBinarySaveLoad() {
         assertDoesNotThrow(() -> {
             for (int i=0; i < expectedBytes.length; i++){
-                assertEquals(expectedBytes[i], App.loadFileBytes(testFileBinary)[i]);
+                assertEquals(expectedBytes[i], NotepadIO.loadFileBytes(testFileBinary)[i]);
             }            
         }, "Failed loading the binary test file");
     }

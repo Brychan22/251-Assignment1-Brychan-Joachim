@@ -1,8 +1,18 @@
 import javax.swing.*;
 import javax.swing.filechooser.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
+
+import org.apache.tika.exception.TikaException;
+
+import NotepadIO.NotepadIO;
+import Syntax.JavaHighlighter;
+
 import java.awt.*;
 import java.awt.print.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -67,21 +77,41 @@ public class EditorWindow {
         JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.addActionListener((x) -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(App.supportedFileTypesFilter);
+            fileChooser.setFileFilter(App.textFileFilter);
+            fileChooser.addChoosableFileFilter(App.ODFFileFilter);
+            fileChooser.addChoosableFileFilter(App.JavaFileFilter);
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
                 if (textContent == null || textArea.getText().equals(textContent)){
                     try{
-                        String t_result = App.loadFileString(fileChooser.getSelectedFile());
-                        if (t_result != null){
-                            textArea.setText(t_result);
-                            textContent = t_result;
+                        if (fileChooser.getFileFilter() == App.ODFFileFilter){
+                            // Using Apache Tika for now. Not ideal, as it doesn't parse all text features effectively
+                            String t_result = NotepadIO.loadMiscViaTika(fileChooser.getSelectedFile());
+                            if (t_result != null){
+                                textArea.setContentType("text/html");
+                                textArea.setText(t_result);
+                            }
+                        }
+                        else if (fileChooser.getFileFilter() == App.JavaFileFilter){
+                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                            if (t_result != null){
+                                textArea.setText(t_result);
+                            }
+                            StyledDocument doc = textArea.getStyledDocument();
+                            JavaHighlighter jh = new JavaHighlighter(t_result);
+                            jh.highlightSymbols(doc);
+                        }
+                        else{
+                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                            if (t_result != null){
+                                textArea.setText(t_result);
+                            }
                         }
                     }
-                    catch (IOException e) { 
+                    catch (Exception e){
                         drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
-                    } 
+                    }
                 }
                 else{
                     App.createNewWindow(fileChooser.getSelectedFile());
@@ -206,7 +236,7 @@ public class EditorWindow {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select a file to save");
         fileChooser.setAcceptAllFileFilterUsed(false); 
-        fileChooser.addChoosableFileFilter(App.supportedFileTypesFilter);
+        fileChooser.addChoosableFileFilter(App.textFileFilter);
         
         
         int userSelection = fileChooser.showSaveDialog(thisWindow);
@@ -232,7 +262,7 @@ public class EditorWindow {
 
     void doSave(){
         try{
-            if(App.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
+            if(NotepadIO.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
                 thisWindow.setTitle(sourceFile.getName() + " - Document");
             }
         }
