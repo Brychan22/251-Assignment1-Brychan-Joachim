@@ -66,6 +66,25 @@ public class EditorWindow {
         thisWindow.setVisible(true);
     }
 
+    EditorWindow(int id, File sourceFile, JTextPane newPane){
+        this.id = id;
+        this.sourceFile = sourceFile;
+        PRNG = new Random();
+        // Create the frame somewhere inwards from the top-right.
+        // Would be better to actually detect screen size though that requires a more 
+        // in-depth implementation. Realistically, the minimum screen real-estate for
+        // modern Windows is 1024*768, so at least part of the window is guaranteed to
+        // be on-screen with a limit of 500 px
+        thisWindow = prepMainFrame();
+        thisWindow.setBounds(PRNG.nextInt(500), PRNG.nextInt(500), 600, 600);
+        // Must set the document of the existing text pane
+        textArea.setDocument(newPane.getDocument());
+        if (sourceFile != null){
+            thisWindow.setTitle(sourceFile.getName() + " - Notepad");
+        }
+        thisWindow.setVisible(true);
+    }
+
     /**
      * Creates a 'main' window frame.
      * @return a frame representing the main content of the app
@@ -89,38 +108,43 @@ public class EditorWindow {
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
-                if (textContent == null || textArea.getText().equals(textContent)){
-                    try{
-                        if (fileChooser.getFileFilter() == App.ODFFileFilter){
-                            // Using Apache Tika for now. Not ideal, as it doesn't parse all text features effectively
-                            String t_result = NotepadIO.loadMiscViaTika(fileChooser.getSelectedFile());
-                            if (t_result != null){
-                                textArea.setContentType("text/html");
-                                textArea.setText(t_result);
-                            }
+                try{
+                    JTextPane newPane = new JTextPane();
+                    String t_result = null;
+                    if (fileChooser.getFileFilter() == App.ODFFileFilter){
+                        // Using Apache Tika for now. Not ideal, as it doesn't parse all text features effectively
+                        t_result = NotepadIO.loadMiscViaTika(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            newPane.setContentType("text/html");
+                            newPane.setText(t_result);                            
                         }
-                        else if (fileChooser.getFileFilter() == App.JavaFileFilter){
-                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
-                            if (t_result != null){
-                                textArea.setText(t_result);
-                            }
-                            StyledDocument doc = textArea.getStyledDocument();
+                    }
+                    else if (fileChooser.getFileFilter() == App.JavaFileFilter){
+                        t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            newPane.setText(t_result);
+                            StyledDocument doc = newPane.getStyledDocument();
                             JavaHighlighter jh = new JavaHighlighter(t_result);
-                            jh.highlightSymbols(doc);
+                            jh.highlightSymbols(doc); 
+                        }
+                    }
+                    else{
+                        t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            newPane.setText(t_result);
+                        }
+                    }
+                    if (t_result != null){
+                        if(textArea.getText().isEmpty()){
+                            textArea.setDocument(newPane.getDocument());
                         }
                         else{
-                            String t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
-                            if (t_result != null){
-                                textArea.setText(t_result);
-                            }
-                        }
-                    }
-                    catch (Exception e){
-                        drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
+                            App.createNewWindow(fileChooser.getSelectedFile(), newPane);
+                        }   
                     }
                 }
-                else{
-                    App.createNewWindow(fileChooser.getSelectedFile());
+                catch (Exception e){
+                    drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
                 }
             }
         });
