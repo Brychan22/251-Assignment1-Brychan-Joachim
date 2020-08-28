@@ -136,7 +136,7 @@ public class NotepadIO {
      * @param saveData the array of byte data to save
      */
     public static boolean saveFile(File file, byte[] saveData) throws SecurityException, FileNotFoundException, IOException {
-        FileOutputStream fos = new FileOutputStream(file);
+        FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
         if (!file.exists()){
             file.createNewFile();
         }

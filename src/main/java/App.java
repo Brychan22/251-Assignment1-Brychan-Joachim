@@ -2,6 +2,7 @@
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,21 +53,26 @@ public final class App {
      * @param sourceFile <i>(Nullable)</i> the file to load when creating the window
      */
     static void createNewWindow(File sourceFile){
-    	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
-        String fileContent = date + '\n';
-        if (sourceFile != null) {
+        String fileContent = null;
+        if (sourceFile == null){
+            String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
+            fileContent = date + '\n';
+        }
+        else{
             try{
                 NotepadIO.loadFileString(sourceFile);
             }
             catch (Exception e){
-
+                e.printStackTrace();
             }
-            
         }
-        int newID = appWindowCount++;
-        
-        EditorWindow newEditorWindow = new EditorWindow(newID, sourceFile, fileContent);
-        editorWindows.put(newID, newEditorWindow);
+        EditorWindow newEditorWindow = new EditorWindow(appWindowCount++, sourceFile, fileContent);
+        editorWindows.put(appWindowCount, newEditorWindow);
+    }
+
+    static void createNewWindow(File sourceFile, JTextPane newPane){
+        EditorWindow newEditorWindow = new EditorWindow(appWindowCount++, sourceFile, newPane);
+        editorWindows.put(appWindowCount, newEditorWindow);
     }
 
     /**
