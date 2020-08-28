@@ -140,7 +140,7 @@ public class NotepadIO {
      * @param saveData the array of byte data to save
      */
     public static boolean saveFile(File file, byte[] saveData) throws SecurityException, FileNotFoundException, IOException {
-        FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(file);
         if (!file.exists()){
             file.createNewFile();
         }
@@ -191,7 +191,8 @@ public class NotepadIO {
 	        System.out.println("Create Simple PDF file with Text");
 	        String fileName = file.getAbsolutePath(); // name of our file
 
-	        PDDocument doc = new PDDocument();
+            PDDocument doc = new PDDocument();
+            
 	        PDPage page = new PDPage();
 
 	        doc.addPage(page);
@@ -200,8 +201,11 @@ public class NotepadIO {
 	        
 	        content.beginText();
 	        content.setFont(PDType1Font.COURIER, 26);
-	        content.showText(saveText);
-	        content.endText();
+	        content.showText(saveText.replace("\r", "").replace("\n", "<br>"));
+            content.endText();
+            content.close();
+
+            doc.save(file);
 	        
 	        }
 	        catch(IOException e)
