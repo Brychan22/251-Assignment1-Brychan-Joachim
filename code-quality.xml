@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Metrics scope="251-Assignment1-Brychan-Joachim" type="Project" date="2020-08-28" xmlns="http://metrics.sourceforge.net/2003/Metrics-First-Flat">
    <Metric id = "VG" description ="McCabe Cyclomatic Complexity" max ="10" hint ="use Extract-method to split the method up">
-      <Values per = "method" avg = "2.84" stddev = "6.868" max = "50" maxinrange="false">
-         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="50" inrange="false"/>
+      <Values per = "method" avg = "2.545" stddev = "2.928" max = "18" maxinrange="false">
+         <Value name="searchNumber" source ="JavaHighlighter.java" package ="Syntax" value ="18" inrange="false"/>
+         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="10"/>
+         <Value name="searchWordBounds" source ="JavaHighlighter.java" package ="Syntax" value ="10"/>
          <Value name="loadBytes" source ="NotepadIO.java" package ="NotepadIO" value ="6"/>
          <Value name="doSave" source ="EditorWindow.java" package ="(default package)" value ="6"/>
+         <Value name="SearchSymbolBounds" source ="JavaHighlighter.java" package ="Syntax" value ="5"/>
          <Value name="showSaveDialog" source ="EditorWindow.java" package ="(default package)" value ="5"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="4"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="4"/>
          <Value name="findNext" source ="StringParser.java" package ="Parsing" value ="4"/>
+         <Value name="inWord" source ="StringParser.java" package ="Parsing" value ="4"/>
          <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="4"/>
          <Value name="loadFile" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="atWord" source ="StringParser.java" package ="Parsing" value ="3"/>
@@ -21,7 +25,7 @@
          <Value name="isEnd" source ="StringParser.java" package ="Parsing" value ="2"/>
          <Value name="move" source ="StringParser.java" package ="Parsing" value ="2"/>
          <Value name="peek" source ="StringParser.java" package ="Parsing" value ="2"/>
-         <Value name="prepMainFrame" source ="EditorWindow.java" package ="(default package)" value ="2"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="2"/>
          <Value name="savePdf" source ="EditorWindow.java" package ="(default package)" value ="2"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="loadFileBytes" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
@@ -38,6 +42,7 @@
          <Value name="highlightSymbols" source ="Highlighter.java" package ="Syntax" value ="1"/>
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
          <Value name="App" source ="App.java" package ="(default package)" value ="1"/>
+         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="main" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="mouseClicked" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="mouseEntered" source ="EditorWindow.java" package ="(default package)" value ="1"/>
@@ -46,6 +51,7 @@
          <Value name="mouseReleased" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="aboutWindow" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="drawPopupAlert" source ="EditorWindow.java" package ="(default package)" value ="1"/>
+         <Value name="prepMainFrame" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="warningWindow" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="createFiles" source ="AppTest.java" package ="(default package)" value ="1"/>
          <Value name="removeFiles" source ="AppTest.java" package ="(default package)" value ="1"/>
@@ -55,14 +61,18 @@
       </Values>
    </Metric>
    <Metric id = "PAR" description ="Number of Parameters" max ="5" hint ="Move invoked method or pass an object">
-      <Values per = "method" avg = "0.9" stddev = "0.854" max = "3">
+      <Values per = "method" avg = "1.091" stddev = "1.1" max = "5">
+         <Value name="searchWordBounds" source ="JavaHighlighter.java" package ="Syntax" value ="5"/>
+         <Value name="SearchSymbolBounds" source ="JavaHighlighter.java" package ="Syntax" value ="4"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="loadFileString" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="3"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="3"/>
          <Value name="createPdf" source ="NotepadIO.java" package ="NotepadIO" value ="2"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="2"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="2"/>
+         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="2"/>
          <Value name="drawPopupAlert" source ="EditorWindow.java" package ="(default package)" value ="2"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="loadBytes" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
@@ -74,12 +84,14 @@
          <Value name="atWord" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="consume" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="findNext" source ="StringParser.java" package ="Parsing" value ="1"/>
+         <Value name="inWord" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="isEnd" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="move" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="peek" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="highlightSymbols" source ="Highlighter.java" package ="Syntax" value ="1"/>
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
          <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
+         <Value name="searchNumber" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
          <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="main" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="windowClosed" source ="App.java" package ="(default package)" value ="1"/>
@@ -109,14 +121,18 @@
       </Values>
    </Metric>
    <Metric id = "NBD" description ="Nested Block Depth" max ="5" hint ="use Extract-method to split the method up">
-      <Values per = "method" avg = "1.72" stddev = "1.096" max = "6" maxinrange="false">
-         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="6" inrange="false"/>
+      <Values per = "method" avg = "1.836" stddev = "1.023" max = "4">
          <Value name="loadBytes" source ="NotepadIO.java" package ="NotepadIO" value ="4"/>
          <Value name="loadFile" source ="NotepadIO.java" package ="NotepadIO" value ="4"/>
+         <Value name="inWord" source ="StringParser.java" package ="Parsing" value ="4"/>
+         <Value name="SearchSymbolBounds" source ="JavaHighlighter.java" package ="Syntax" value ="4"/>
+         <Value name="searchWordBounds" source ="JavaHighlighter.java" package ="Syntax" value ="4"/>
          <Value name="showSaveDialog" source ="EditorWindow.java" package ="(default package)" value ="4"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="3"/>
          <Value name="findNext" source ="StringParser.java" package ="Parsing" value ="3"/>
+         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="3"/>
+         <Value name="searchNumber" source ="JavaHighlighter.java" package ="Syntax" value ="3"/>
          <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="3"/>
          <Value name="doSave" source ="EditorWindow.java" package ="(default package)" value ="3"/>
          <Value name="createPdf" source ="NotepadIO.java" package ="NotepadIO" value ="2"/>
@@ -131,6 +147,7 @@
          <Value name="peek" source ="StringParser.java" package ="Parsing" value ="2"/>
          <Value name="windowClosed" source ="App.java" package ="(default package)" value ="2"/>
          <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="2"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="2"/>
          <Value name="savePdf" source ="EditorWindow.java" package ="(default package)" value ="2"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="loadFileString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
@@ -144,6 +161,7 @@
          <Value name="reset" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
          <Value name="App" source ="App.java" package ="(default package)" value ="1"/>
+         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="main" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="mouseClicked" source ="EditorWindow.java" package ="(default package)" value ="1"/>
          <Value name="mouseEntered" source ="EditorWindow.java" package ="(default package)" value ="1"/>
@@ -190,25 +208,25 @@
       </Values>
    </Metric>
    <Metric id = "RMA" description ="Abstractness">
-      <Values per = "packageFragment" avg = "0.1" stddev = "0.2" max = "0.5">
-         <Value name="Syntax" package ="Syntax" value ="0.5"/>
+      <Values per = "packageFragment" avg = "0" stddev = "0" max = "0">
          <Value name="(default package)" package ="(default package)" value ="0"/>
          <Value name="NotepadIO" package ="NotepadIO" value ="0"/>
          <Value name="Parsing" package ="Parsing" value ="0"/>
-         <Value name="(default package)" package ="(default package)" value ="0"/>
-      </Values>
-   </Metric>
-   <Metric id = "RMD" description ="Normalized Distance">
-      <Values per = "packageFragment" avg = "0.35" stddev = "0.436" max = "1">
-         <Value name="Parsing" package ="Parsing" value ="1"/>
-         <Value name="NotepadIO" package ="NotepadIO" value ="0.75"/>
-         <Value name="(default package)" package ="(default package)" value ="0"/>
          <Value name="Syntax" package ="Syntax" value ="0"/>
          <Value name="(default package)" package ="(default package)" value ="0"/>
       </Values>
    </Metric>
+   <Metric id = "RMD" description ="Normalized Distance">
+      <Values per = "packageFragment" avg = "0.45" stddev = "0.4" max = "1">
+         <Value name="Parsing" package ="Parsing" value ="1"/>
+         <Value name="NotepadIO" package ="NotepadIO" value ="0.75"/>
+         <Value name="Syntax" package ="Syntax" value ="0.5"/>
+         <Value name="(default package)" package ="(default package)" value ="0"/>
+         <Value name="(default package)" package ="(default package)" value ="0"/>
+      </Values>
+   </Metric>
    <Metric id = "DIT" description ="Depth of Inheritance Tree">
-      <Values per = "type" avg = "0.875" stddev = "0.331" max = "1">
+      <Values per = "type" avg = "1" stddev = "0" max = "1">
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="1"/>
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="1"/>
@@ -220,19 +238,19 @@
       </Values>
    </Metric>
    <Metric id = "WMC" description ="Weighted methods per Class">
-      <Values per = "type" total = "142" avg = "17.75" stddev = "15.562" max = "51">
-         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="51"/>
+      <Values per = "type" total = "140" avg = "20" stddev = "13.384" max = "44">
+         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="44"/>
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="27"/>
-         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="23"/>
-         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="22"/>
-         <Value name="App" source ="App.java" package ="(default package)" value ="8"/>
+         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="27"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="23"/>
+         <Value name="App" source ="App.java" package ="(default package)" value ="9"/>
          <Value name="ClickOnlyListener" source ="EditorWindow.java" package ="(default package)" value ="5"/>
          <Value name="AppTest" source ="AppTest.java" package ="(default package)" value ="5"/>
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="1"/>
       </Values>
    </Metric>
    <Metric id = "NSC" description ="Number of Children">
-      <Values per = "type" total = "1" avg = "0.125" stddev = "0.331" max = "1">
+      <Values per = "type" total = "0" avg = "0" stddev = "0" max = "0">
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="1"/>
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="0"/>
          <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="0"/>
@@ -256,10 +274,10 @@
       </Values>
    </Metric>
    <Metric id = "LCOM" description ="Lack of Cohesion of Methods">
-      <Values per = "type" avg = "0.219" stddev = "0.328" max = "0.875">
-         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="0.875"/>
-         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="0.657"/>
-         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="0.222"/>
+      <Values per = "type" avg = "0.263" stddev = "0.352" max = "0.906">
+         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="0.906"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="0.686"/>
+         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="0.25"/>
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="0"/>
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="0"/>
          <Value name="App" source ="App.java" package ="(default package)" value ="0"/>
@@ -268,7 +286,7 @@
       </Values>
    </Metric>
    <Metric id = "NOF" description ="Number of Attributes">
-      <Values per = "type" total = "17" avg = "2.125" stddev = "3.18" max = "8">
+      <Values per = "type" total = "17" avg = "2.429" stddev = "3.289" max = "8">
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="8"/>
          <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="7"/>
          <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="2"/>
@@ -280,10 +298,10 @@
       </Values>
    </Metric>
    <Metric id = "NSF" description ="Number of Static Attributes">
-      <Values per = "type" total = "16" avg = "2" stddev = "2.693" max = "7">
+      <Values per = "type" total = "17" avg = "2.429" stddev = "2.77" max = "7">
          <Value name="App" source ="App.java" package ="(default package)" value ="7"/>
          <Value name="AppTest" source ="AppTest.java" package ="(default package)" value ="6"/>
-         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="2"/>
+         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="3"/>
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="0"/>
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="0"/>
@@ -292,21 +310,21 @@
       </Values>
    </Metric>
    <Metric id = "NOM" description ="Number of Methods">
-      <Values per = "type" total = "33" avg = "4.125" stddev = "4.136" max = "13">
-         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="13"/>
-         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="8"/>
+      <Values per = "type" total = "37" avg = "5.286" stddev = "4.495" max = "14">
+         <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="14"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="9"/>
+         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="5"/>
          <Value name="ClickOnlyListener" source ="EditorWindow.java" package ="(default package)" value ="5"/>
          <Value name="AppTest" source ="AppTest.java" package ="(default package)" value ="3"/>
-         <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="2"/>
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="1"/>
          <Value name="App" source ="App.java" package ="(default package)" value ="1"/>
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="0"/>
       </Values>
    </Metric>
    <Metric id = "NSM" description ="Number of Static Methods">
-      <Values per = "type" total = "17" avg = "2.125" stddev = "3.887" max = "12">
+      <Values per = "type" total = "18" avg = "2.571" stddev = "4.101" max = "12">
          <Value name="NotepadIO" source ="NotepadIO.java" package ="NotepadIO" value ="12"/>
-         <Value name="App" source ="App.java" package ="(default package)" value ="3"/>
+         <Value name="App" source ="App.java" package ="(default package)" value ="4"/>
          <Value name="AppTest" source ="AppTest.java" package ="(default package)" value ="2"/>
          <Value name="StringParser" source ="StringParser.java" package ="Parsing" value ="0"/>
          <Value name="Highlighter" source ="Highlighter.java" package ="Syntax" value ="0"/>
@@ -328,20 +346,20 @@
       </Values>
    </Metric>
    <Metric id = "NOC" description ="Number of Classes">
-      <Values per = "packageFragment" total = "8" avg = "1.6" stddev = "0.8" max = "3">
+      <Values per = "packageFragment" total = "7" avg = "1.4" stddev = "0.8" max = "3">
          <Value name="(default package)" package ="(default package)" value ="3"/>
-         <Value name="Syntax" package ="Syntax" value ="2"/>
          <Value name="NotepadIO" package ="NotepadIO" value ="1"/>
          <Value name="Parsing" package ="Parsing" value ="1"/>
+         <Value name="Syntax" package ="Syntax" value ="1"/>
          <Value name="(default package)" package ="(default package)" value ="1"/>
       </Values>
    </Metric>
    <Metric id = "NOI" description ="Number of Interfaces">
-      <Values per = "packageFragment" total = "1" avg = "0.2" stddev = "0.4" max = "1">
-         <Value name="Syntax" package ="Syntax" value ="1"/>
+      <Values per = "packageFragment" total = "0" avg = "0" stddev = "0" max = "0">
          <Value name="(default package)" package ="(default package)" value ="0"/>
          <Value name="NotepadIO" package ="NotepadIO" value ="0"/>
          <Value name="Parsing" package ="Parsing" value ="0"/>
+         <Value name="Syntax" package ="Syntax" value ="0"/>
          <Value name="(default package)" package ="(default package)" value ="0"/>
       </Values>
    </Metric>
@@ -349,23 +367,28 @@
       <Value value="5"/>
    </Metric>
    <Metric id = "TLOC" description ="Total Lines of Code">
-      <Value value="790"/>
+      <Value value="830"/>
    </Metric>
    <Metric id = "MLOC" description ="Method Lines of Code">
-      <Values per = "method" total = "540" avg = "10.8" stddev = "25.065" max = "160">
-         <Value name="prepMainFrame" source ="EditorWindow.java" package ="(default package)" value ="160"/>
-         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="90"/>
+      <Values per = "method" total = "571" avg = "10.382" stddev = "22.426" max = "165">
+         <Value name="prepMainFrame" source ="EditorWindow.java" package ="(default package)" value ="165"/>
+         <Value name="highlightSymbols" source ="JavaHighlighter.java" package ="Syntax" value ="40"/>
          <Value name="showSaveDialog" source ="EditorWindow.java" package ="(default package)" value ="24"/>
+         <Value name="searchWordBounds" source ="JavaHighlighter.java" package ="Syntax" value ="23"/>
          <Value name="loadBytes" source ="NotepadIO.java" package ="NotepadIO" value ="22"/>
+         <Value name="createPdf" source ="NotepadIO.java" package ="NotepadIO" value ="19"/>
          <Value name="aboutWindow" source ="EditorWindow.java" package ="(default package)" value ="19"/>
-         <Value name="createPdf" source ="NotepadIO.java" package ="NotepadIO" value ="17"/>
+         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="15"/>
          <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="15"/>
          <Value name="doSave" source ="EditorWindow.java" package ="(default package)" value ="14"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="13"/>
          <Value name="loadFile" source ="NotepadIO.java" package ="NotepadIO" value ="13"/>
          <Value name="findNext" source ="StringParser.java" package ="Parsing" value ="13"/>
+         <Value name="inWord" source ="StringParser.java" package ="Parsing" value ="13"/>
          <Value name="saveFile" source ="NotepadIO.java" package ="NotepadIO" value ="12"/>
-         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="12"/>
+         <Value name="SearchSymbolBounds" source ="JavaHighlighter.java" package ="Syntax" value ="12"/>
+         <Value name="searchNumber" source ="JavaHighlighter.java" package ="Syntax" value ="11"/>
+         <Value name="EditorWindow" source ="EditorWindow.java" package ="(default package)" value ="10"/>
          <Value name="atWord" source ="StringParser.java" package ="Parsing" value ="9"/>
          <Value name="warningWindow" source ="EditorWindow.java" package ="(default package)" value ="9"/>
          <Value name="drawPopupAlert" source ="EditorWindow.java" package ="(default package)" value ="8"/>
@@ -385,6 +408,7 @@
          <Value name="testNewWindowSpeed" source ="AppTest.java" package ="(default package)" value ="3"/>
          <Value name="testTextSaveLoad" source ="AppTest.java" package ="(default package)" value ="3"/>
          <Value name="JavaHighlighter" source ="JavaHighlighter.java" package ="Syntax" value ="2"/>
+         <Value name="createNewWindow" source ="App.java" package ="(default package)" value ="2"/>
          <Value name="createFiles" source ="AppTest.java" package ="(default package)" value ="2"/>
          <Value name="loadBytesAsString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
          <Value name="loadFileString" source ="NotepadIO.java" package ="NotepadIO" value ="1"/>
