@@ -1,13 +1,30 @@
 import javax.swing.*;
 import javax.swing.filechooser.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
+
+import org.apache.tika.exception.TikaException;
+
+import NotepadIO.NotepadIO;
+import Syntax.JavaHighlighter;
+
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.print.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Random;
 import java.awt.event.*;
@@ -23,8 +40,8 @@ public class EditorWindow {
     private File sourceFile;
     private JTextPane textArea;
     private JFrame thisWindow;
+    private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     Random PRNG;
-    PrinterJob printerJob = PrinterJob.getPrinterJob();
     
     EditorWindow(int id, File sourceFile, String content){
         this.id = id;
@@ -49,6 +66,25 @@ public class EditorWindow {
         thisWindow.setVisible(true);
     }
 
+    EditorWindow(int id, File sourceFile, JTextPane newPane){
+        this.id = id;
+        this.sourceFile = sourceFile;
+        PRNG = new Random();
+        // Create the frame somewhere inwards from the top-right.
+        // Would be better to actually detect screen size though that requires a more 
+        // in-depth implementation. Realistically, the minimum screen real-estate for
+        // modern Windows is 1024*768, so at least part of the window is guaranteed to
+        // be on-screen with a limit of 500 px
+        thisWindow = prepMainFrame();
+        thisWindow.setBounds(PRNG.nextInt(500), PRNG.nextInt(500), 600, 600);
+        // Must set the document of the existing text pane
+        textArea.setDocument(newPane.getDocument());
+        if (sourceFile != null){
+            thisWindow.setTitle(sourceFile.getName() + " - Notepad");
+        }
+        thisWindow.setVisible(true);
+    }
+
     /**
      * Creates a 'main' window frame.
      * @return a frame representing the main content of the app
@@ -59,32 +95,56 @@ public class EditorWindow {
         /* ---- Menus ---- */
         //#region File Menu
         JMenu fileMenu = new JMenu("File");
-        JMenuItem newMenuItem = new JMenuItem("New");
-        JMenuItem newWindowMenuItem = new JMenuItem("New Window");
+        JMenuItem newWindowMenuItem = new JMenuItem("New");
         newWindowMenuItem.addActionListener((x) -> {
             App.createNewWindow(null);
         });
         JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.addActionListener((x) -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(App.supportedFileTypesFilter);
+            fileChooser.setFileFilter(App.textFileFilter);
+            fileChooser.addChoosableFileFilter(App.ODFFileFilter);
+            fileChooser.addChoosableFileFilter(App.JavaFileFilter);
             int returnVal = fileChooser.showOpenDialog((JMenuItem)x.getSource());
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 System.out.println("Selected file:" + fileChooser.getSelectedFile().getName());
-                if (textContent == null || textArea.getText().equals(textContent)){
-                    try{
-                        String t_result = App.loadFileString(fileChooser.getSelectedFile());
+                try{
+                    JTextPane newPane = new JTextPane();
+                    String t_result = null;
+                    if (fileChooser.getFileFilter() == App.ODFFileFilter){
+                        // Using Apache Tika for now. Not ideal, as it doesn't parse all text features effectively
+                        t_result = NotepadIO.loadMiscViaTika(fileChooser.getSelectedFile());
                         if (t_result != null){
-                            textArea.setText(t_result);
-                            textContent = t_result;
+                            newPane.setContentType("text/html");
+                            newPane.setText(t_result);                            
                         }
                     }
-                    catch (IOException e) { 
-                        drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
-                    } 
+                    else if (fileChooser.getFileFilter() == App.JavaFileFilter){
+                        t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            newPane.setText(t_result);
+                            StyledDocument doc = newPane.getStyledDocument();
+                            JavaHighlighter jh = new JavaHighlighter(t_result);
+                            jh.highlightSymbols(doc); 
+                        }
+                    }
+                    else{
+                        t_result = NotepadIO.loadFileString(fileChooser.getSelectedFile());
+                        if (t_result != null){
+                            newPane.setText(t_result);
+                        }
+                    }
+                    if (t_result != null){
+                        if(textArea.getText().isEmpty()){
+                            textArea.setDocument(newPane.getDocument());
+                        }
+                        else{
+                            App.createNewWindow(fileChooser.getSelectedFile(), newPane);
+                        }   
+                    }
                 }
-                else{
-                    App.createNewWindow(fileChooser.getSelectedFile());
+                catch (Exception e){
+                    drawPopupAlert("Error", "Failed to open the file:\n\n" + e.getLocalizedMessage());
                 }
             }
         });
@@ -100,44 +160,94 @@ public class EditorWindow {
             sourceFile = showSaveDialog();
             doSave();
         });
+        JMenuItem exportPdfMenuItem = new JMenuItem("Export As PDF");
+        exportPdfMenuItem.addActionListener((x) -> {
+            sourceFile = showSaveDialog();
+            savePdf();
+        });
         JMenuItem printMenuItem = new JMenuItem("Print");
         printMenuItem.addActionListener((x) -> {
-            if (printerJob.printDialog()) {
-                try {printerJob.print();}
+                try {
+            		boolean complete = textArea.print();
+            		if(complete) {
+            			JOptionPane.showMessageDialog(null, "Done Printing!", "Information", JOptionPane.INFORMATION_MESSAGE);
+            		}
+        		}
                 catch (PrinterException exc) {
                     System.out.println(exc);
                  }
-             } 
-        });
-        JMenuItem pageSetupMenuItem = new JMenuItem("Page Setup...");
-        pageSetupMenuItem.addActionListener((x) -> {
-            printerJob.pageDialog(printerJob.defaultPage());
         });
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener((x) -> {
             App.windowClosed(id);
             thisWindow.dispatchEvent(new WindowEvent(thisWindow, WindowEvent.WINDOW_CLOSING));
         });
-        fileMenu.add(newMenuItem);
         fileMenu.add(newWindowMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(saveMenuItem);
         fileMenu.add(saveAsMenuItem);
         fileMenu.addSeparator();
+        fileMenu.add(exportPdfMenuItem);
         fileMenu.add(printMenuItem);
-        fileMenu.add(pageSetupMenuItem);
         fileMenu.addSeparator();
         fileMenu.add(exitMenuItem);
         //#endregion
         //#region Edit Menu
         JMenu editMenu = new JMenu("Edit");
         JMenuItem cutMenuItem = new JMenuItem("Cut");
+        cutMenuItem.addActionListener((x) -> {
+       	 if (textArea.getSelectedText() != null) { // See if they selected something 
+                String string = textArea.getSelectedText();
+                StringSelection selection = new StringSelection(string);
+                clipboard.setContents(selection, selection);
+                textArea.replaceSelection("");
+            } else {
+            	JFrame warningFrame = warningWindow("No string is selected!");
+            	warningFrame.setVisible(true);
+            }
+        });
+        
+        
         JMenuItem copyMenuItem = new JMenuItem("Copy");
+        copyMenuItem.addActionListener((x) -> {
+        	 if (textArea.getSelectedText() != null) { // See if they selected something 
+                 String string = textArea.getSelectedText();
+                 StringSelection selection = new StringSelection(string);
+                 clipboard.setContents(selection, selection);
+             } else {
+            	 JFrame warningFrame = warningWindow("No string is selected!");
+            	 warningFrame.setVisible(true);
+             }
+        });
+        
         JMenuItem pasteMenuItem = new JMenuItem("Paste");
+        pasteMenuItem.addActionListener((x) -> {
+        	Transferable content = clipboard.getContents(this);
+            String clipboardString;
+            try {
+            	clipboardString = (String) content.getTransferData(DataFlavor.stringFlavor);
+              	textArea.getDocument().insertString(textArea.getCaretPosition(), clipboardString, null);
+            } catch (Exception e) {
+            	e.printStackTrace();
+              	JFrame warningFrame = warningWindow("Clipboard does not contain string!");
+     	 		warningFrame.setVisible(true);
+            }
+       });
+       
+        JMenuItem dateAndTimeMenuItem = new JMenuItem("Time/Date");
+        dateAndTimeMenuItem.addActionListener((x) -> {
+        	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).format(ZonedDateTime.now());
+        	try {
+				textArea.getDocument().insertString(textArea.getCaretPosition(), date, null);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+        });
 
         editMenu.add(cutMenuItem);
         editMenu.add(copyMenuItem);
         editMenu.add(pasteMenuItem);
+        editMenu.add(dateAndTimeMenuItem);
         //#endregion
         //#region Help Menu
         JMenu helpMenu = new JMenu("Help");
@@ -158,8 +268,14 @@ public class EditorWindow {
 
         /* Text Area */
         textArea = new JTextPane();
-
         mainFrame.add(textArea);
+        
+        /* scrollbar */        
+        JScrollPane scroll = new JScrollPane (textArea,
+     		   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        mainFrame.add(scroll);
+
         return mainFrame;
     }
     
@@ -198,6 +314,26 @@ public class EditorWindow {
     }
 
     /**
+     * Creates a popup window if copy is pressed but nothing is selected
+     */
+    JFrame warningWindow(String warningMessage){
+        JFrame noSelectionFrame = new JFrame(warningMessage);
+        JLabel warning;
+
+        warning = new JLabel(warningMessage);
+        warning.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+
+        noSelectionFrame.setTitle(warningMessage);
+        noSelectionFrame.add(warning);
+        
+        noSelectionFrame.setSize(300, 100);
+        noSelectionFrame.setLayout(new BoxLayout(noSelectionFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+        return noSelectionFrame;
+    }
+
+    
+    
+    /**
      * Shows the file save dialogue box
      * @return the selected save file
      */
@@ -206,7 +342,8 @@ public class EditorWindow {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select a file to save");
         fileChooser.setAcceptAllFileFilterUsed(false); 
-        fileChooser.addChoosableFileFilter(App.supportedFileTypesFilter);
+        fileChooser.addChoosableFileFilter(App.textFileFilter);
+        fileChooser.addChoosableFileFilter(App.pdfFileFilter);
         
         
         int userSelection = fileChooser.showSaveDialog(thisWindow);
@@ -222,17 +359,17 @@ public class EditorWindow {
                 targetFile = fileChooser.getSelectedFile();
             }
             else{
-                targetFile = new File(fileChooser.getSelectedFile().getName() + "." + ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()[0]);
+                targetFile = new File(fileChooser.getSelectedFile().getAbsolutePath() + "." + ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()[0]);
             }
             
             System.out.println("Save as file: " + targetFile.getAbsolutePath());
         }
         return targetFile;
     }
-
-    void doSave(){
-        try{
-            if(App.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
+    
+    void doSave() {
+    	try{
+            if(NotepadIO.saveFile(sourceFile, textArea.getText()) && thisWindow.getTitle() != sourceFile.getName() + " - Document"){
                 thisWindow.setTitle(sourceFile.getName() + " - Document");
             }
         }
@@ -244,6 +381,15 @@ public class EditorWindow {
         }
         catch (IOException e){
             drawPopupAlert("Error", "An IO Error occurred:\n\n" + e.getLocalizedMessage());
+        }  
+    }
+    
+    void savePdf(){
+        try{
+            NotepadIO.createPdf(sourceFile, textArea.getText());
+        }
+        catch (SecurityException e){
+            drawPopupAlert("Error", "Access to the file was denied:\n\n" + e.getLocalizedMessage());
         }  
     }
 
