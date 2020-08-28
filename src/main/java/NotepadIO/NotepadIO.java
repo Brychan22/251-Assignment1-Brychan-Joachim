@@ -193,17 +193,21 @@ public class NotepadIO {
 
             PDDocument doc = new PDDocument();
             
-	        PDPage page = new PDPage();
-
-	        doc.addPage(page);
-
-	        PDPageContentStream content = new PDPageContentStream(doc, page);
-	        
-	        content.beginText();
-	        content.setFont(PDType1Font.COURIER, 26);
-	        content.showText(saveText.replace("\r", "").replace("\n", "<br>"));
-            content.endText();
-            content.close();
+            for (List<String> page : pages(saveText, 15, 720)) {
+                PDPage docPage = new PDPage();
+                doc.addPage(docPage);
+                PDPageContentStream content = new PDPageContentStream(doc, docPage);
+                
+                content.setFont(PDType1Font.COURIER, 12);
+                for (int i = 0; i < page.size(); i++) {
+                    
+                    content.beginText();
+                    content.newLineAtOffset(50,750-i*15);
+                    content.showText(page.get(i));
+                    content.endText();               
+                }
+                content.close();
+            }
 
             doc.save(file);
 	        
@@ -212,5 +216,28 @@ public class NotepadIO {
     	 	{
 	        	System.out.println(e.getMessage());
 	        }
-	}
+    }
+    
+    public static List<List<String>> pages(String source, int fontSize, int pageHeight){
+        source = source.replace("\r", "");
+        for (int i = 0; i < 31; i++){
+            if (i != 10){
+                source = source.replace(Character.toString((char)i), "");
+            }
+        }
+        int pageLineLimit = pageHeight/fontSize;
+        String[] sourceLines = source.split("\n");
+        List<List<String>> Pages = new ArrayList<>();
+        List<String> pageLines = new ArrayList<>();
+        for (String sourceLine : sourceLines) {
+            if (pageLines.size() >= pageLineLimit){
+                Pages.add(pageLines);
+                pageLines = new ArrayList<>();
+            }
+            pageLines.add(sourceLine);
+        }
+        Pages.add(pageLines);
+        
+        return Pages;
+    }
 }
