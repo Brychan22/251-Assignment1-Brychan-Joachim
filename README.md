@@ -18,9 +18,9 @@ https://github.com/Alpha3114/251-Assignment1-Brychan-Joachim/commit/fc0b0b87a182
 https://github.com/Alpha3114/251-Assignment1-Brychan-Joachim/commit/06e002866051cf6b9ca80f8a35f56d432325715e
 
 ## How to run the program
- - Loads .txt, .java, and .odt files
-    - ODT support can be verified against the 'ODTSample.odt' in the root directory
- - Supports OS-level printing
+Using the command line, enter and run
+`mvn exec:java "-Dexec.mainClass=App"`
+from the root directory
 
 ## Metrics:
 
