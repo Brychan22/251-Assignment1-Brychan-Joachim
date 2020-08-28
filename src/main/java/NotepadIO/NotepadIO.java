@@ -19,6 +19,10 @@ import java.awt.*;
 import org.apache.tika.sax.*;
 import org.apache.tika.sax.ToXMLContentHandler;
 import org.apache.tika.parser.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 
@@ -174,4 +178,35 @@ public class NotepadIO {
     public static boolean saveFile(File file, String saveText) throws SecurityException, FileNotFoundException, IOException {
         return saveFile(file, saveText, "UTF-8");
     }
+    
+    
+    /**
+     * Saves the specified text in PDF format to a file, showing an error message if an issue occurred.
+     * @param file the File to save to
+     * @param saveText the text to save
+     */
+    public static void createPdf(File file, String saveText) {
+    	 try
+    	 {
+	        System.out.println("Create Simple PDF file with Text");
+	        String fileName = file.getAbsolutePath(); // name of our file
+
+	        PDDocument doc = new PDDocument();
+	        PDPage page = new PDPage();
+
+	        doc.addPage(page);
+
+	        PDPageContentStream content = new PDPageContentStream(doc, page);
+	        
+	        content.beginText();
+	        content.setFont(PDType1Font.COURIER, 26);
+	        content.showText(saveText);
+	        content.endText();
+	        
+	        }
+	        catch(IOException e)
+    	 	{
+	        	System.out.println(e.getMessage());
+	        }
+	}
 }

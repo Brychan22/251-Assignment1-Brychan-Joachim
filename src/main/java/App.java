@@ -33,6 +33,7 @@ public final class App {
     static int appWindowCount = 0;
 
     static FileNameExtensionFilter textFileFilter = new FileNameExtensionFilter("Text Documents (*.txt)", "txt");
+    static FileNameExtensionFilter pdfFileFilter = new FileNameExtensionFilter("PDF (*.pdf)", "pdf");
     static FileNameExtensionFilter ODFFileFilter = new FileNameExtensionFilter("Open-Office Document (*.odt)", "odt");
     static FileNameExtensionFilter JavaFileFilter = new FileNameExtensionFilter("Java Source File (*.java)", "java");
     
