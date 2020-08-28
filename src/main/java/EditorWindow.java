@@ -359,7 +359,7 @@ public class EditorWindow {
                 targetFile = fileChooser.getSelectedFile();
             }
             else{
-                targetFile = new File(fileChooser.getSelectedFile().getName() + "." + ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()[0]);
+                targetFile = new File(fileChooser.getSelectedFile().getAbsolutePath() + "." + ((FileNameExtensionFilter)fileChooser.getFileFilter()).getExtensions()[0]);
             }
             
             System.out.println("Save as file: " + targetFile.getAbsolutePath());
